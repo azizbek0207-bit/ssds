@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Avto Ehtiyot Qismlar — Online Platforma</title>
+
+  <style>
+    :root{
+      --text:#e8eefc;
+      --muted:#a9b7d0;
+      --accent:#4f8cff;
+      --accent2:#7c3aed;
+      --danger:#ff4f6d;
+      --border: rgba(255,255,255,0.10);
+      --shadow: 0 12px 28px rgba(0,0,0,0.28);
+      --radius: 14px;
+      --panel: rgba(16,26,46,0.86);
+      --card: rgba(14,23,48,0.9);
+      --ok: #27d797;
+      --warn:#ffcc66;
+    }
+    *{ box-sizing: border-box; }
+    body{
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(900px 450px at 20% 10%, #163566, transparent),
+        radial-gradient(900px 450px at 80% 15%, #1a3a7a, transparent),
+        linear-gradient(180deg, #070b14, #0b1220);
+      line-height: 1.55;
+    }
+
+    /* Watermark */
+    body::before{
+      content: "A Z I Z";
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: clamp(120px, 16vw, 260px);
+      font-weight: 900;
+      letter-spacing: 0.32em;
+      color: rgba(0,0,0,0.30);
+      transform: rotate(-12deg);
+      pointer-events: none;
+      z-index: 0;
+      text-shadow: 0 2px 0 rgba(255,255,255,0.06);
+    }
+
+    header, main, .overlay, .drawer, .toast, .pmodal, #pOverlay, .cmodal, #cOverlay, .amodal, #aOverlay{
+      position: relative;
+      z-index: 1;
+    }
+
+    .container{ max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+    .muted{ color: var(--muted); }
+
+    header{
+      position: sticky; top: 0; z-index: 10;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.28);
+      backdrop-filter: blur(8px);
+    }
+    .topbar{
+      display:flex; align-items:center; justify-content: space-between;
+      gap: 12px; padding: 14px 0;
+    }
+
+    .brand{
+      display:flex; align-items:center; gap: 10px;
+      font-weight: 900; letter-spacing: 0.3px;
+      min-width: 260px;
+    }
+    .logoWrap{
+      display:flex; flex-direction:column; gap: 8px;
+      align-items:flex-start;
+      flex: 0 0 auto;
+    }
+    .logo{
+      width: 38px; height: 38px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #7aa8ff);
+      display:grid; place-items:center;
+      box-shadow: var(--shadow);
+      font-weight: 900;
+      flex: 0 0 auto;
+      user-select:none;
+    }
+    .adminBtn{
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-weight: 900;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      cursor: pointer;
+      white-space: nowrap;
+      font-size: 12px;
+      line-height: 1;
+    }
+    .adminStatus{
+      font-size: 12px;
+      font-weight: 900;
+      color: rgba(233,240,255,0.92);
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      display:none;
+      align-items:center;
+      gap: 6px;
+    }
+    .dot{
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--ok);
+      box-shadow: 0 0 0 3px rgba(39,215,151,0.15);
+      display:inline-block;
+    }
+
+    .brand-text{ display:flex; flex-direction:column; line-height:1.15; }
+    .brand-title{ font-weight: 900; }
+    .brand-sub, .brand-founder{ font-weight:700; font-size:12px; margin-top:3px; }
+
+    .search{
+      flex: 1;
+      display:flex;
+      gap: 10px;
+      max-width: 560px;
+      margin: 0 8px;
+      align-items:center;
+    }
+    input, select, textarea{
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(79,140,255,0.85);
+      box-shadow: 0 0 0 3px rgba(79,140,255,0.18);
+    }
+
+    .btn{
+      border: 0; cursor: pointer; font-weight: 900;
+      padding: 11px 14px; border-radius: 12px;
+      background: var(--accent); color: #fff; white-space: nowrap;
+    }
+    .btn.secondary{ background: transparent; border: 1px solid rgba(255,255,255,0.18); color: var(--text); }
+    .btn.danger{ background: transparent; border: 1px solid rgba(255,79,109,0.45); color: #ffd6dd; }
+    .btn:active{ transform: translateY(1px); }
+
+    .cart-mini{
+      display:flex; align-items:center; gap: 8px;
+      padding: 9px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      cursor:pointer;
+      font-weight: 900;
+    }
+    .badge{
+      display:inline-grid; place-items:center;
+      min-width: 22px; height: 22px; padding: 0 7px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: var(--text); font-size: 12px; font-weight: 900;
+    }
+
+    main{ padding: 18px 0 28px; }
+    .panel{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .tabs{ display:flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .tab{
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      cursor:pointer;
+      font-weight: 900;
+    }
+    .tab.active{
+      background: rgba(79,140,255,0.22);
+      border-color: rgba(79,140,255,0.55);
+    }
+
+    .filters{
+      display:grid; gap: 10px;
+      grid-template-columns: 1fr 1fr;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 520px){ .filters{ grid-template-columns: 1fr; } }
+
+    .grid{
+      display:grid; gap: 12px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 560px){ .grid{ grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 860px){ .grid{ grid-template-columns: 1fr 1fr 1fr; } }
+
+    .card{
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 14px;
+      overflow: hidden;
+      display:flex; flex-direction: column;
+      min-height: 300px;
+      cursor: pointer;
+    }
+    .img{
+      height: 150px;
+      background: linear-gradient(135deg, rgba(79,140,255,0.18), rgba(255,255,255,0.05));
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+      overflow: hidden;
+      display:block;
+    }
+    .img img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display:block;
+    }
+    .img .fallback{
+      height: 150px; display:grid; place-items:center;
+      padding: 10px; text-align:center;
+      font-weight: 900; color: rgba(255,255,255,0.9);
+    }
+
+    .card-body{ padding: 12px; display:flex; flex-direction: column; gap: 8px; flex: 1; }
+    .title{ font-weight: 900; }
+    .meta{ color: var(--muted); font-size: 13px; display:flex; gap: 10px; flex-wrap: wrap; }
+    .price{ font-size: 18px; font-weight: 900; margin-top: 2px; }
+    .card-actions{ margin-top: auto; display:flex; gap: 10px; flex-wrap:wrap; }
+    .pill{ font-size: 12px; border: 1px solid rgba(255,255,255,0.14); color: var(--muted); border-radius: 999px; padding: 5px 9px; }
+    .pill.warn{ border-color: rgba(255,204,102,0.45); color: #ffe0a3; }
+    .pill.ok{ border-color: rgba(39,215,151,0.45); color: #bff6e3; }
+
+    .empty{
+      color: var(--muted);
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,0.18);
+      text-align:center;
+      margin-top: 10px;
+    }
+
+    /* Drawer cart */
+    .overlay{
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      display:none;
+      z-index: 100;
+    }
+    .drawer{
+      position: fixed;
+      top: 0; right: 0;
+      width: 360px;
+      max-width: 92vw;
+      height: 100vh;
+      background: rgba(16,26,46,0.96);
+      border-left: 1px solid rgba(255,255,255,0.12);
+      box-shadow: var(--shadow);
+      transform: translateX(100%);
+      transition: transform 220ms ease;
+      z-index: 101;
+      display:flex;
+      flex-direction: column;
+    }
+    .drawer.open{ transform: translateX(0); }
+    .overlay.open{ display:block; }
+    .drawer-header{
+      padding: 14px;
+      display:flex; align-items:center; justify-content: space-between; gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+    .drawer-body{ padding: 14px; overflow:auto; flex: 1; }
+    .drawer-footer{
+      padding: 14px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.02);
+    }
+    .cart-list{ display:grid; gap: 10px; margin-top: 10px; }
+    .cart-item{
+      display:grid; gap: 10px;
+      grid-template-columns: 1fr auto;
+      align-items:center;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+    }
+    .cart-item .name{ font-weight: 800; }
+    .qty{ display:flex; gap: 6px; align-items:center; justify-content: flex-end; flex-wrap: wrap; }
+    .qty button{
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: transparent;
+      color: var(--text);
+      font-weight: 900;
+      cursor:pointer;
+    }
+    .summary{ display:grid; gap: 8px; }
+    .row2{ display:flex; justify-content: space-between; gap: 10px; color: var(--muted); }
+    .row2 strong{ color: var(--text); }
+
+    /* Toast */
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(16,26,46,0.92);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      padding: 10px 14px;
+      box-shadow: var(--shadow);
+      color: var(--text);
+      display:none;
+      max-width: calc(100% - 24px);
+      text-align:center;
+      z-index: 200;
+    }
+
+    /* ===== Product Modal ===== */
+    #pOverlay{
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 150;
+      display:none;
+    }
+    .pmodal{
+      position: fixed;
+      inset: 0;
+      display:none;
+      place-items: center;
+      z-index: 151;
+      padding: 16px;
+    }
+    .pmodal-box{
+      width: min(920px, 96vw);
+      background: rgba(16,26,46,0.96);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .pmodal-head{
+      padding: 14px;
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+    .pmodal-title{ font-weight: 900; font-size: 18px; }
+
+    .pmodal-body{
+      display:grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 14px;
+      padding: 14px;
+    }
+    @media (max-width: 760px){
+      .pmodal-body{ grid-template-columns: 1fr; }
+    }
+    .pmodal-img{
+      height: 320px;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.06);
+      display:block;
+    }
+    .pmodal-img img{ width:100%; height:100%; object-fit: cover; display:block; }
+    .pmodal-img .fallback{
+      height: 320px;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      padding: 12px;
+      font-weight: 900;
+    }
+    .pmodal-price{ font-weight: 900; font-size: 22px; }
+    .pmodal-meta{
+      margin-top: 10px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* ===== Admin/Login Modal ===== */
+    #aOverlay{
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.62);
+      z-index: 170;
+      display:none;
+    }
+    .amodal{
+      position: fixed;
+      inset: 0;
+      display:none;
+      place-items: center;
+      z-index: 171;
+      padding: 16px;
+    }
+    .amodal-box{
+      width: min(980px, 96vw);
+      background: rgba(16,26,46,0.96);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .amodal-head{
+      padding: 14px;
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+    .amodal-title{ font-weight:900; font-size:18px; }
+    .amodal-body{
+      padding: 14px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 860px){
+      .amodal-body{ grid-template-columns: 1fr; }
+    }
+    .apanel{
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .field{ display:grid; gap: 8px; margin-bottom: 12px; }
+    .field label{ font-size: 13px; font-weight: 900; color: rgba(233,240,255,0.85); }
+    .adminGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 620px){ .adminGrid{ grid-template-columns: 1fr; } }
+    .rowActions{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .small{
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .table{
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow:hidden;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+    .table th, .table td{
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      vertical-align: top;
+      font-size: 13px;
+    }
+    .table th{
+      text-align:left;
+      color: rgba(233,240,255,0.9);
+      background: rgba(255,255,255,0.04);
+      font-weight: 900;
+    }
+    .table tr:last-child td{ border-bottom: 0; }
+    .tbtn{
+      padding: 7px 10px;
+      border-radius: 10px;
+      font-weight: 900;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+    .tbtn.danger{
+      border-color: rgba(255,79,109,0.45);
+      color:#ffd6dd;
+    }
+
+    /* ===== Payment Modal (Demo) ===== */
+    .paymodal{
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      z-index: 181;
+      padding: 16px;
+    }
+    .paybox{
+      width: min(1100px, 96vw);
+      background: rgba(16,26,46,0.96);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .payhead{
+      padding: 14px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+    .paytitle{ font-weight: 900; font-size: 22px; }
+    .paybody{
+      padding: 14px;
+      display:grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+    @media (max-width: 920px){
+      .paybody{ grid-template-columns: 1fr; }
+    }
+
+    .cardPreview{
+      position: relative;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background:
+        radial-gradient(560px 260px at 18% 20%, rgba(124,58,237,0.55), transparent),
+        radial-gradient(560px 260px at 60% 30%, rgba(79,140,255,0.45), transparent),
+        linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+      padding: 26px;
+      min-height: 320px;
+      box-shadow: 0 18px 42px rgba(0,0,0,0.35);
+    }
+    .chip{
+      width: 52px;
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.08);
+      position: relative;
+    }
+    .chip::before, .chip::after{
+      content:"";
+      position:absolute;
+      left: 10px;
+      right: 10px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.18);
+    }
+    .chip::before{ top: 12px; }
+    .chip::after{ top: 24px; }
+
+    .brandDots{
+      position:absolute;
+      top: 24px;
+      right: 24px;
+      display:flex;
+      gap: 8px;
+    }
+    .brandDots span{
+      width: 16px; height: 16px; border-radius: 50%;
+      display:inline-block;
+      opacity: 0.95;
+    }
+    .brandDots .dot1{ background: #ff4f6d; }
+    .brandDots .dot2{ background: #ffcc66; }
+
+    .cardNumber{
+      margin-top: 70px;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: rgba(233,240,255,0.95);
+      text-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    }
+    .cardBottom{
+      position:absolute;
+      left: 26px;
+      right: 26px;
+      bottom: 22px;
+      display:flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .cardLabel{
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      color: rgba(233,240,255,0.55);
+      font-weight: 900;
+    }
+    .cardValue{
+      font-size: 14px;
+      font-weight: 900;
+      margin-top: 6px;
+      color: rgba(233,240,255,0.92);
+    }
+
+    .payform{
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .payformTitle{ font-weight: 900; font-size: 20px; margin-bottom: 8px; }
+    .payrow{
+      display:grid;
+      grid-template-columns: 1fr 1fr 0.8fr;
+      gap: 10px;
+      align-items:end;
+    }
+    @media (max-width: 520px){
+      .payrow{ grid-template-columns: 1fr; }
+    }
+    .paybtn{
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container">
+      <div class="topbar">
+        <div class="brand">
+          <div class="logoWrap">
+            <div class="logo">T</div>
+            <button class="adminBtn" id="adminBtn" type="button">Adminlar uchun</button>
+            <div class="adminStatus" id="adminStatus" title="Admin rejim yoqilgan">
+              <span class="dot"></span>
+              <span id="adminName">Admin</span>
+              <button class="adminBtn" id="adminLogoutBtn" type="button" style="padding:6px 8px;">Chiqish</button>
+            </div>
+          </div>
+
+          <div class="brand-text">
+            <div class="brand-title">Avto Ehtiyot Qismlar</div>
+            <div class="brand-sub muted">Ehtiyot qismlar va avto aksessuarlar</div>
+            <div class="brand-founder muted">Do‘kon asoschisi: Xavasov Azizbek</div>
+            <div class="brand-founder muted">Do‘kon Yordamchisi: Tulaganov Samir</div>
+            <div class="brand-founder muted">Savdo maslahatchisi: Nazarova O'g'iloy</div>
+          </div>
+        </div>
+
+        <div class="search">
+          <input id="q" type="text" placeholder="Qidirish: filtr, tormoz, moy, svecha..." />
+          <button class="btn" id="searchBtn" type="button">Qidiruv</button>
+        </div>
+
+        <button class="cart-mini" id="cartBtn" type="button" title="Savatchani ochish">
+          Savat <span class="badge" id="cartCount">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="panel">
+        <div class="tabs">
+          <button class="tab active" id="tabAll" type="button">Hammasi</button>
+          <button class="tab" id="tabSpare" type="button">Ehtiyot qismlar</button>
+          <button class="tab" id="tabAccessories" type="button">Avto aksessuarlar</button>
+        </div>
+
+        <div class="filters">
+          <select id="brandFilter">
+            <option value="all">Barcha brendlar</option>
+          </select>
+
+          <select id="sortBy">
+            <option value="default">Saralash (default)</option>
+            <option value="price_asc">Narx: arzon → qimmat</option>
+            <option value="price_desc">Narx: qimmat → arzon</option>
+            <option value="name_asc">Nomi: A → Z</option>
+          </select>
+        </div>
+
+        <div class="grid" id="productGrid"></div>
+        <div id="noResults" class="empty" style="display:none;">Hech narsa topilmadi.</div>
+      </section>
+
+      <section class="panel" id="adminPanel" style="margin-top:12px; display:none;">
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;">
+          <div>
+            <div style="font-weight:900; font-size:18px;">Admin panel</div>
+            <div class="muted" style="font-size:13px;">Mahsulot qo‘shish / tahrirlash / o‘chirish</div>
+          </div>
+          <div class="rowActions">
+            <button class="btn secondary" id="exportBtn" type="button">Export (JSON)</button>
+            <button class="btn secondary" id="resetBtn" type="button">Bazani tiklash</button>
+          </div>
+        </div>
+
+        <div class="adminGrid" style="margin-top:12px;">
+          <div class="apanel">
+            <div style="font-weight:900; margin-bottom:8px;">Mahsulot formasi</div>
+
+            <div class="field">
+              <label for="aName">Nomi</label>
+              <input id="aName" placeholder="Masalan: Moy filtri / Tormoz kolodkasi..." />
+            </div>
+
+            <div class="adminGrid">
+              <div class="field">
+                <label for="aType">Turi</label>
+                <select id="aType">
+                  <option value="spare">Ehtiyot qism</option>
+                  <option value="accessory">Avto aksessuar</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="aCategory">Kategoriya</label>
+                <input id="aCategory" placeholder="Filtr / Tormoz / Dvigatel / Elektrik..." />
+              </div>
+            </div>
+
+            <div class="adminGrid">
+              <div class="field">
+                <label for="aBrand">Brend (detal brendi)</label>
+                <input id="aBrand" placeholder="Bosch / Mann / Valeo..." />
+              </div>
+              <div class="field">
+                <label for="aModel">Mashina nomi: (model)</label>
+                <input id="aModel" placeholder="Cobalt, Gentra, Nexia 3..." />
+              </div>
+            </div>
+
+            <div class="adminGrid">
+              <div class="field">
+                <label for="aOEM"> Kod (ixtiyoriy)</label>
+                <input id="aOEM" placeholder="Masalan: 54648565" />
+              </div>
+              <div class="field">
+                <label for="aCondition">Holati</label>
+                <select id="aCondition">
+                  <option value="Yangi">Yangi</option>
+                  <option value="Ishlatilgan">Ishlatilgan</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="adminGrid">
+              <div class="field">
+                <label for="aPrice">Narx (so‘m)</label>
+                <input id="aPrice" inputmode="numeric" placeholder="Masalan: 250000" />
+              </div>
+              <div class="field">
+                <label for="aImage">Rasm yo‘li (fayl nomi yoki link)</label>
+                <input id="aImage" placeholder='Masalan: images/filtr.jpg yoki "Filtr.jpg"' />
+              </div>
+            </div>
+
+            <div class="rowActions">
+              <button class="btn" id="aSaveBtn" type="button">Saqlash</button>
+              <button class="btn secondary" id="aClearBtn" type="button">Tozalash</button>
+              <span class="small" id="aHint"></span>
+            </div>
+          </div>
+
+          <div class="apanel">
+            <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;">
+              <div style="font-weight:900;">Mahsulotlar ro‘yxati</div>
+              <div class="small">Jami: <strong id="aCount" style="color:var(--text);">0</strong></div>
+            </div>
+            <div style="overflow:auto; margin-top:10px;">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Nomi</th>
+                    <th>Turi</th>
+                    <th>Narx</th>
+                    <th>Amal</th>
+                  </tr>
+                </thead>
+                <tbody id="aTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Cart Drawer -->
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="drawer" id="drawer">
+    <div class="drawer-header">
+      <div>
+        <div style="font-weight:900; font-size:18px;">Savatcha</div>
+        <div class="muted" style="font-size:13px;">Ichidagilarni shu yerda ko‘rasiz</div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button class="btn danger" id="clearCartBtn" type="button">Tozalash</button>
+        <button class="btn secondary" id="closeDrawerBtn" type="button">Yopish</button>
+      </div>
+    </div>
+
+    <div class="drawer-body">
+      <div class="muted" style="font-size:13px;">Maslahat: `+` va `-` bilan sonini o‘zgartiring.</div>
+      <div id="cartList" class="cart-list"></div>
+      <div id="cartEmpty" class="empty">Savatcha bo‘sh.</div>
+    </div>
+
+    <div class="drawer-footer">
+      <div class="summary">
+        <div class="row2">
+          <span>Mahsulotlar soni</span>
+          <strong id="itemsCount">0</strong>
+        </div>
+        <div class="row2">
+          <span>Jami</span>
+          <strong id="totalPrice">0 so‘m</strong>
+        </div>
+        <button class="btn" id="checkoutBtn" type="button">Buyurtma berish</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Product Modal -->
+  <div id="pOverlay"></div>
+  <div class="pmodal" id="pModal" aria-hidden="true">
+    <div class="pmodal-box">
+      <div class="pmodal-head">
+        <div>
+          <div class="pmodal-title" id="pTitle">Mahsulot</div>
+          <div class="muted" style="font-size:13px;" id="pSub">Kategoriya • Brend • Mosligi</div>
+        </div>
+        <button class="btn secondary" id="pCloseBtn" type="button">Yopish</button>
+      </div>
+
+      <div class="pmodal-body">
+        <div class="pmodal-img" id="pImgWrap"></div>
+
+        <div class="pmodal-info">
+          <div class="pmodal-price" id="pPrice">0 so‘m</div>
+          <div class="pmodal-meta" id="pMeta"></div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+            <button class="btn" id="pAddBtn" type="button">Savatga qo‘shish</button>
+            <button class="btn secondary" id="pMinusBtn" type="button">- 1 ta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin/Login Modal -->
+  <div id="aOverlay"></div>
+  <div class="amodal" id="aModal" aria-hidden="true">
+    <div class="amodal-box">
+      <div class="amodal-head">
+        <div>
+          <div class="amodal-title">Admin kirish</div>
+          <div class="muted" style="font-size:13px;">Faqat do‘kon asoschilari uchun</div>
+        </div>
+        <button class="btn secondary" id="aCloseBtn" type="button">Yopish</button>
+      </div>
+
+      <div class="amodal-body">
+        <div class="apanel">
+          <div style="font-weight:900; margin-bottom:8px;">Kirish</div>
+
+          <div class="field">
+            <label for="aUser">Admin</label>
+            <select id="aUser">
+              <option value="azizbek">Xavasov Azizbek</option>
+              <option value="samir">Tulaganov Samir</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="aPass">Parol</label>
+            <input id="aPass" type="password" placeholder="Parolni kiriting..." />
+          </div>
+
+          <div class="rowActions">
+            <button class="btn" id="aLoginBtn" type="button">Kirish</button>
+          </div>
+        </div>
+
+        <div class="apanel">
+          <div style="font-weight:900; margin-bottom:8px;">Admin nimalar qila oladi?</div>
+          <ul class="small" style="margin:0; padding-left:18px;">
+            <li>Mahsulot qo‘shish</li>
+            <li>Mahsulotni tahrirlash</li>
+            <li>Mahsulotni o‘chirish</li>
+            <li>Mahsulotlar ro‘yxatini ko‘rish</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Modal (Demo) -->
+  <div id="payOverlay" style="display:none; position:fixed; inset:0; background: rgba(0,0,0,0.62); z-index: 180;"></div>
+
+  <div id="payModal" class="paymodal" style="display:none;" aria-hidden="true">
+    <div class="paybox">
+      <div class="payhead">
+        <div>
+          <div class="paytitle">To‘lash uchun bosing)</div>
+          <div class="muted" style="font-size:13px;">Jami: <strong id="payTotalText">0 so‘m</strong></div>
+        </div>
+        <button class="btn secondary" id="payCloseBtn" type="button">Yopish</button>
+      </div>
+
+      <div class="paybody">
+        <div class="cardPreview">
+          <div class="chip"></div>
+          <div class="brandDots">
+            <span class="dot1"></span><span class="dot2"></span>
+          </div>
+
+          <div class="cardNumber" id="pvNumber">1234 5678 9012 3456</div>
+
+          <div class="cardBottom">
+            <div>
+              <div class="cardLabel">NAME ON CARD</div>
+              <div class="cardValue" id="pvName">NAME SURNAME</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="cardLabel">MM/YY</div>
+              <div class="cardValue" id="pvExp">MM/YY</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="payform">
+          <div class="payformTitle">To‘lov ma’lumotlari</div>
+          <div class="muted" style="font-size:13px; margin-bottom: 12px;">
+            Kartangizni kiriting. Yozganingiz karta ustida avtomatik ko‘rinadi.
+          </div>
+
+          <div class="field">
+            <label for="cardNumber">Card Number</label>
+            <input id="cardNumber" inputmode="numeric" placeholder="1234 5678 9012 3456" maxlength="19" />
+          </div>
+
+          <div class="field">
+            <label for="cardHolder">Card Holder</label>
+            <input id="cardHolder" placeholder="Ism Familiya" />
+          </div>
+
+          <div class="payrow">
+            <div class="field">
+              <label for="expMonth">Expiration Date</label>
+              <select id="expMonth">
+                <option value="">Month</option>
+                <option>01</option><option>02</option><option>03</option><option>04</option><option>05</option><option>06</option>
+                <option>07</option><option>08</option><option>09</option><option>10</option><option>11</option><option>12</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="expYear">&nbsp;</label>
+              <select id="expYear">
+                <option value="">Year</option>
+                <option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option>
+                <option>2031</option><option>2032</option><option>2033</option><option>2034</option><option>2035</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="cvv">CVV</label>
+              <input id="cvv" inputmode="numeric" placeholder="123" maxlength="3" />
+            </div>
+          </div>
+
+          <button class="btn paybtn" id="payBtn" type="button">To'lov uchun bosing </button>
+
+          <div class="small" style="margin-top:10px;">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">OK</div>
+
+  <script>
+    const PRODUCTS_KEY = "avto_shop_products_v1";
+    const ADMIN_KEY = "avto_shop_admin_v1";
+
+    const defaultProducts = [
+      { id: 1001, type:"spare", name:"Moy filtri", brand:"Mann", category:"Filtr", model:"Cobalt, Gentra", oem:"—", condition:"Yangi", price: 85000, image:"Mann Moy filtri.jpg" },
+      { id: 1002, type:"spare", name:"Havo filtri", brand:"Bosch", category:"Filtr", model:"Nexia 3, Gentra", oem:"—", condition:"Yangi", price: 95000, image:"Bosch Havo filtri.jpg" },
+      { id: 1003, type:"spare", name:"Tormoz kolodkasi (old)", brand:"Valeo", category:"Tormoz", model:"Cobalt", oem:"—", condition:"Yangi", price: 260000, image:"Valeo Tormoz kolodkasi.jpg" },
+
+      { id: 2001, type:"accessory", name:"Telefon ushlagich", brand:"Baseus", category:"Salon", model:"Hamma", oem:"—", condition:"Yangi", price: 99000, image:"Baseus Telefon ushlagich.jpeg" },
+      { id: 2002, type:"accessory", name:"LED lampa", brand:"Philips", category:"Yoritish", model:"Hamma", oem:"—", condition:"Yangi", price: 175000, image:"Philips LED lampa.jpg" },
+
+      { id: 9101, type:"accessory", name:"AirPods Pro (2-avlod)", brand:"Apple", category:"Audio", model:"—", oem:"—", condition:"Yangi", price:2990000, image:"Apple AirPods Pro.jpg" },
+      { id: 9102, type:"accessory", name:"Bluetooth naushnik", brand:"Samsung", category:"Audio", model:"—", oem:"—", condition:"Yangi", price:1290000, image:"Samsung Bluetooth naushnik.jpg" },
+      { id: 9103, type:"accessory", name:"Powerbank 20 000 mAh", brand:"Xiaomi", category:"Zaryad", model:"—", oem:"—", condition:"Yangi", price:399000, image:"Xiaomi Powerbank 20 000 mAh.jpg" }
+    ];
+
+    function loadProducts(){
+      try{
+        const raw = localStorage.getItem(PRODUCTS_KEY);
+        if (!raw) return structuredClone(defaultProducts);
+        const list = JSON.parse(raw);
+        if (!Array.isArray(list) || list.length === 0) return structuredClone(defaultProducts);
+        return list;
+      }catch{
+        return structuredClone(defaultProducts);
+      }
+    }
+    function saveProducts(list){
+      localStorage.setItem(PRODUCTS_KEY, JSON.stringify(list));
+    }
+
+    let products = loadProducts();
+    let cart = {};
+    let currentTab = "all";
+    let selectedProductId = null;
+
+    let admin = loadAdmin();
+
+    const fmt = (n) => Number(n||0).toLocaleString("uz-UZ") + " so‘m";
+
+    function toast(msg){
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.style.display = "block";
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => el.style.display = "none", 1400);
+    }
+
+    function setActiveTab(tab){
+      currentTab = tab;
+      document.getElementById("tabAll").classList.toggle("active", tab === "all");
+      document.getElementById("tabSpare").classList.toggle("active", tab === "spare");
+      document.getElementById("tabAccessories").classList.toggle("active", tab === "accessory");
+      rebuildBrandFilter();
+      renderProducts();
+    }
+
+    function rebuildBrandFilter(){
+      const brandSelect = document.getElementById("brandFilter");
+      const prev = brandSelect.value || "all";
+      const list = products.filter(p => currentTab === "all" ? true : p.type === currentTab);
+      const set = new Set(list.map(p => p.brand || "Boshqa"));
+      const brands = ["all", ...Array.from(set).sort((a,b) => a.localeCompare(b))];
+
+      brandSelect.innerHTML = "";
+      brands.forEach(b => {
+        const opt = document.createElement("option");
+        opt.value = b;
+        opt.textContent = (b === "all") ? "Barcha brendlar" : b;
+        brandSelect.appendChild(opt);
+      });
+
+      brandSelect.value = brands.includes(prev) ? prev : "all";
+    }
+
+    function getFilteredProducts(){
+      const q = document.getElementById("q").value.trim().toLowerCase();
+      const brand = document.getElementById("brandFilter").value;
+      const sortBy = document.getElementById("sortBy").value;
+
+      let list = products.filter(p => {
+        const matchTab = (currentTab === "all") ? true : (p.type === currentTab);
+        const hay = [p.name, p.brand, p.category, p.model, p.oem, p.condition]
+          .map(x => String(x||"").toLowerCase()).join(" ");
+        const matchQ = !q || hay.includes(q);
+        const matchBrand = (brand === "all") || ((p.brand||"") === brand);
+        return matchTab && matchQ && matchBrand;
+      });
+
+      if (sortBy === "price_asc") list.sort((a,b) => (a.price||0) - (b.price||0));
+      if (sortBy === "price_desc") list.sort((a,b) => (b.price||0) - (a.price||0));
+      if (sortBy === "name_asc") list.sort((a,b) => String(a.name||"").localeCompare(String(b.name||"")));
+      return list;
+    }
+
+    function renderProducts(){
+      const grid = document.getElementById("productGrid");
+      const noResults = document.getElementById("noResults");
+      const list = getFilteredProducts();
+
+      grid.innerHTML = "";
+      noResults.style.display = list.length ? "none" : "block";
+
+      list.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.addEventListener("click", () => openProductModal(p.id));
+
+        const imgWrap = document.createElement("div");
+        imgWrap.className = "img";
+
+        const img = document.createElement("img");
+        img.src = p.image || "";
+        img.alt = p.name || "Mahsulot";
+        img.loading = "lazy";
+        img.onerror = () => {
+          imgWrap.innerHTML = `<div class="fallback">${(p.brand||"")}<br>${(p.name||"")}</div>`;
+        };
+        imgWrap.appendChild(img);
+
+        const body = document.createElement("div");
+        body.className = "card-body";
+
+        const title = document.createElement("div");
+        title.className = "title";
+        title.textContent = p.name || "Mahsulot";
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        meta.innerHTML = `
+          <span class="pill">${p.type === "accessory" ? "Avto aksessuar" : "Ehtiyot qism"}</span>
+          <span class="pill">${p.category || "Kategoriya"}</span>
+          <span class="pill">${p.brand || "Brend"}</span>
+          <span class="pill ${p.condition === "Yangi" ? "ok" : "warn"}">${p.condition || "Holat"}</span>
+        `;
+
+        const compat = document.createElement("div");
+        compat.className = "muted";
+        compat.style.fontSize = "13px";
+        compat.textContent = "Mosligi: " + (p.model || "—");
+
+        const price = document.createElement("div");
+        price.className = "price";
+        price.textContent = fmt(p.price);
+
+        const actions = document.createElement("div");
+        actions.className = "card-actions";
+
+        const addBtn = document.createElement("button");
+        addBtn.className = "btn";
+        addBtn.type = "button";
+        addBtn.textContent = "Savatga qo‘shish";
+        addBtn.addEventListener("click", (e) => { e.stopPropagation(); addToCart(p.id); });
+
+        const quickMinus = document.createElement("button");
+        quickMinus.className = "btn secondary";
+        quickMinus.type = "button";
+        quickMinus.textContent = "-";
+        quickMinus.title = "Savatchadan 1 ta kamaytirish";
+        quickMinus.addEventListener("click", (e) => { e.stopPropagation(); removeOneFromCart(p.id); });
+
+        actions.appendChild(addBtn);
+        actions.appendChild(quickMinus);
+
+        body.appendChild(title);
+        body.appendChild(meta);
+        body.appendChild(compat);
+        body.appendChild(price);
+        body.appendChild(actions);
+
+        card.appendChild(imgWrap);
+        card.appendChild(body);
+        grid.appendChild(card);
+      });
+    }
+
+    function addToCart(id){
+      cart[id] = (cart[id] || 0) + 1;
+      toast("Savatchaga qo‘shildi");
+      renderCart();
+      updateBadges();
+    }
+    function removeOneFromCart(id){
+      if (!cart[id]) return;
+      cart[id] -= 1;
+      if (cart[id] <= 0) delete cart[id];
+      toast("Kamaytirildi");
+      renderCart();
+      updateBadges();
+    }
+    function removeFromCart(id){
+      if (!cart[id]) return;
+      delete cart[id];
+      toast("O‘chirildi");
+      renderCart();
+      updateBadges();
+    }
+    function clearCart(){
+      cart = {};
+      toast("Savatcha tozalandi");
+      renderCart();
+      updateBadges();
+    }
+
+    function cartItems(){
+      return Object.entries(cart).map(([id, qty]) => {
+        const p = products.find(x => x.id === Number(id));
+        return { ...p, qty };
+      }).filter(x => x && x.id);
+    }
+
+    function totals(){
+      const items = cartItems();
+      const count = items.reduce((s, x) => s + (x.qty||0), 0);
+      const total = items.reduce((s, x) => s + (x.qty||0) * (x.price||0), 0);
+      return { count, total };
+    }
+
+    function updateBadges(){
+      const t = totals();
+      document.getElementById("cartCount").textContent = t.count;
+      document.getElementById("itemsCount").textContent = t.count;
+      document.getElementById("totalPrice").textContent = fmt(t.total);
+    }
+
+    function renderCart(){
+      const listEl = document.getElementById("cartList");
+      const emptyEl = document.getElementById("cartEmpty");
+      const items = cartItems();
+
+      listEl.innerHTML = "";
+      emptyEl.style.display = items.length ? "none" : "block";
+
+      items.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "cart-item";
+
+        const left = document.createElement("div");
+        left.innerHTML = `
+          <div class="name">${item.name || ""}</div>
+          <div class="muted" style="font-size:13px;">
+            ${item.type === "accessory" ? "Avto aksessuar" : "Ehtiyot qism"} • ${(item.brand||"")} • ${(item.category||"")}
+          </div>
+          <div class="muted" style="font-size:13px;">Mosligi: ${(item.model||"—")}</div>
+          <div style="margin-top:4px; font-weight:900;">${fmt(item.price)}</div>
+        `;
+
+        const right = document.createElement("div");
+        right.className = "qty";
+
+        const minus = document.createElement("button");
+        minus.textContent = "-";
+        minus.addEventListener("click", () => removeOneFromCart(item.id));
+
+        const qty = document.createElement("span");
+        qty.style.fontWeight = "900";
+        qty.style.minWidth = "22px";
+        qty.style.textAlign = "center";
+        qty.textContent = item.qty;
+
+        const plus = document.createElement("button");
+        plus.textContent = "+";
+        plus.addEventListener("click", () => addToCart(item.id));
+
+        const del = document.createElement("button");
+        del.textContent = "O‘chirish";
+        del.addEventListener("click", () => removeFromCart(item.id));
+
+        right.appendChild(minus);
+        right.appendChild(qty);
+        right.appendChild(plus);
+        right.appendChild(del);
+
+        row.appendChild(left);
+        row.appendChild(right);
+        listEl.appendChild(row);
+      });
+
+      updateBadges();
+    }
+
+    function openCart(){
+      document.getElementById("overlay").classList.add("open");
+      document.getElementById("drawer").classList.add("open");
+    }
+    function closeCart(){
+      document.getElementById("overlay").classList.remove("open");
+      document.getElementById("drawer").classList.remove("open");
+    }
+
+    function openProductModal(id){
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+      selectedProductId = id;
+
+      document.getElementById("pTitle").textContent = p.name || "Mahsulot";
+      document.getElementById("pSub").textContent = `${p.category || "Kategoriya"} • ${p.brand || "Brend"} • Mosligi: ${p.model || "—"}`;
+
+      document.getElementById("pPrice").textContent = fmt(p.price);
+      document.getElementById("pMeta").innerHTML = `
+        <span class="pill">${p.type === "accessory" ? "Avto aksessuar" : "Ehtiyot qism"}</span>
+        <span class="pill">${p.category || "Kategoriya"}</span>
+        <span class="pill">${p.brand || "Brend"}</span>
+        <span class="pill ${p.condition === "Yangi" ? "ok" : "warn"}">${p.condition || "Holat"}</span>
+        ${p.oem && p.oem !== "—" ? `<span class="pill">OEM: ${p.oem}</span>` : ``}
+      `;
+
+      const wrap = document.getElementById("pImgWrap");
+      wrap.innerHTML = "";
+      wrap.className = "pmodal-img";
+      const img = document.createElement("img");
+      img.src = p.image || "";
+      img.alt = p.name || "Mahsulot";
+      img.onerror = () => { wrap.innerHTML = `<div class="fallback">${(p.brand||"")}<br>${(p.name||"")}</div>`; };
+      wrap.appendChild(img);
+
+      document.getElementById("pOverlay").style.display = "block";
+      document.getElementById("pModal").style.display = "grid";
+      document.getElementById("pModal").setAttribute("aria-hidden", "false");
+    }
+
+    function closeProductModal(){
+      document.getElementById("pOverlay").style.display = "none";
+      document.getElementById("pModal").style.display = "none";
+      document.getElementById("pModal").setAttribute("aria-hidden", "true");
+      selectedProductId = null;
+    }
+
+    function openPayModal(){
+      const t = totals();
+      document.getElementById("payTotalText").textContent = fmt(t.total);
+
+      document.getElementById("pvNumber").textContent = "1234 5678 9012 3456";
+      document.getElementById("pvName").textContent = "NAME SURNAME";
+      document.getElementById("pvExp").textContent = "MM/YY";
+
+      document.getElementById("cardNumber").value = "";
+      document.getElementById("cardHolder").value = "";
+      document.getElementById("expMonth").value = "";
+      document.getElementById("expYear").value = "";
+      document.getElementById("cvv").value = "";
+
+      document.getElementById("payOverlay").style.display = "block";
+      document.getElementById("payModal").style.display = "grid";
+      document.getElementById("payModal").setAttribute("aria-hidden","false");
+      setTimeout(() => document.getElementById("cardNumber").focus(), 0);
+    }
+
+    function closePayModal(){
+      document.getElementById("payOverlay").style.display = "none";
+      document.getElementById("payModal").style.display = "none";
+      document.getElementById("payModal").setAttribute("aria-hidden","true");
+    }
+
+    function checkout(){
+      const t = totals();
+      if (t.count === 0){ toast("Savatcha bo‘sh"); return; }
+      closeCart();
+      openPayModal();
+    }
+
+    function loadAdmin(){
+      try{
+        const raw = localStorage.getItem(ADMIN_KEY);
+        if (!raw) return { on:false };
+        const a = JSON.parse(raw);
+        if (!a || typeof a !== "object") return { on:false };
+        if (!a.on) return { on:false };
+        return a;
+      }catch{
+        return { on:false };
+      }
+    }
+    function saveAdmin(a){
+      localStorage.setItem(ADMIN_KEY, JSON.stringify(a));
+    }
+
+    const ADMIN_CREDENTIALS = {
+      azizbek: { name: "Xavasov Azizbek", pass: "aziz123" },
+      samir:   { name: "Tulaganov Samir", pass: "samir123" }
+    };
+
+    function setAdminUI(){
+      const status = document.getElementById("adminStatus");
+      const btn = document.getElementById("adminBtn");
+      const panel = document.getElementById("adminPanel");
+
+      if (admin && admin.on){
+        status.style.display = "inline-flex";
+        document.getElementById("adminName").textContent = admin.name || "Admin";
+        btn.style.display = "none";
+        panel.style.display = "block";
+        renderAdminTable();
+      }else{
+        status.style.display = "none";
+        btn.style.display = "inline-block";
+        panel.style.display = "none";
+      }
+    }
+
+    function openAdminModal(){
+      document.getElementById("aOverlay").style.display = "block";
+      document.getElementById("aModal").style.display = "grid";
+      document.getElementById("aModal").setAttribute("aria-hidden","false");
+      document.getElementById("aPass").value = "";
+      document.getElementById("aPass").focus();
+    }
+    function closeAdminModal(){
+      document.getElementById("aOverlay").style.display = "none";
+      document.getElementById("aModal").style.display = "none";
+      document.getElementById("aModal").setAttribute("aria-hidden","true");
+    }
+
+    function adminLogin(){
+      const user = document.getElementById("aUser").value;
+      const pass = document.getElementById("aPass").value || "";
+      const cred = ADMIN_CREDENTIALS[user];
+      if (!cred){ toast("Admin topilmadi"); return; }
+      if (pass !== cred.pass){
+        toast("Parol noto‘g‘ri");
+        return;
+      }
+      admin = { on:true, user, name: cred.name };
+      saveAdmin(admin);
+      setAdminUI();
+      closeAdminModal();
+      toast("Admin kirdi");
+    }
+
+    function adminLogout(){
+      admin = { on:false };
+      saveAdmin(admin);
+      setAdminUI();
+      toast("Admin chiqdi");
+    }
+
+    let editId = null;
+    function adminClearForm(){
+      editId = null;
+      document.getElementById("aName").value = "";
+      document.getElementById("aType").value = "spare";
+      document.getElementById("aCategory").value = "";
+      document.getElementById("aBrand").value = "";
+      document.getElementById("aModel").value = "";
+      document.getElementById("aOEM").value = "";
+      document.getElementById("aCondition").value = "Yangi";
+      document.getElementById("aPrice").value = "";
+      document.getElementById("aImage").value = "";
+      document.getElementById("aHint").textContent = "Yangi mahsulot qo‘shyapsiz.";
+    }
+
+    function nextId(){
+      const maxId = products.reduce((m,p) => Math.max(m, Number(p.id)||0), 0);
+      return maxId + 1;
+    }
+
+    function adminSaveProduct(){
+      const name = document.getElementById("aName").value.trim();
+      const type = document.getElementById("aType").value;
+      const category = document.getElementById("aCategory").value.trim();
+      const brand = document.getElementById("aBrand").value.trim();
+      const model = document.getElementById("aModel").value.trim();
+      const oem = document.getElementById("aOEM").value.trim() || "—";
+      const condition = document.getElementById("aCondition").value;
+      const price = Number(String(document.getElementById("aPrice").value).replace(/\D/g,""));
+      const image = document.getElementById("aImage").value.trim() || "image.png";
+
+      if (!name || !category || !brand || !model || !price){
+        toast("Formani to‘liq to‘ldiring (nom/kategoriya/brend/mosligi/narx)");
+        return;
+      }
+
+      if (editId == null){
+        const p = { id: nextId(), type, name, brand, category, model, oem, condition, price, image };
+        products.unshift(p);
+        toast("Mahsulot qo‘shildi");
+      } else {
+        const idx = products.findIndex(x => x.id === editId);
+        if (idx >= 0){
+          products[idx] = { ...products[idx], type, name, brand, category, model, oem, condition, price, image };
+          toast("Mahsulot yangilandi");
+        }
+      }
+
+      saveProducts(products);
+      rebuildBrandFilter();
+      renderProducts();
+      renderAdminTable();
+      adminClearForm();
+    }
+
+    function adminEditProduct(id){
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+      editId = id;
+      document.getElementById("aName").value = p.name || "";
+      document.getElementById("aType").value = p.type || "spare";
+      document.getElementById("aCategory").value = p.category || "";
+      document.getElementById("aBrand").value = p.brand || "";
+      document.getElementById("aModel").value = p.model || "";
+      document.getElementById("aOEM").value = p.oem || "—";
+      document.getElementById("aCondition").value = p.condition || "Yangi";
+      document.getElementById("aPrice").value = p.price || "";
+      document.getElementById("aImage").value = p.image || "";
+      document.getElementById("aHint").textContent = "Tahrirlash rejimi: ID " + id;
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    }
+
+    function adminDeleteProduct(id){
+      if (!confirm("Mahsulot o‘chirilsinmi?")) return;
+      products = products.filter(x => x.id !== id);
+      saveProducts(products);
+      rebuildBrandFilter();
+      renderProducts();
+      renderAdminTable();
+      toast("O‘chirildi");
+      if (cart[id]) { delete cart[id]; renderCart(); updateBadges(); }
+      if (editId === id) adminClearForm();
+    }
+
+    function renderAdminTable(){
+      const body = document.getElementById("aTableBody");
+      const count = document.getElementById("aCount");
+      body.innerHTML = "";
+      count.textContent = products.length;
+
+      products.slice(0, 200).forEach(p => {
+        const tr = document.createElement("tr");
+
+        const td1 = document.createElement("td");
+        td1.innerHTML = `<div style="font-weight:900;">${p.name||""}</div>
+                         <div class="muted" style="font-size:12px;">${p.category||""} • ${p.brand||""}</div>
+                         <div class="muted" style="font-size:12px;">Mosligi: ${p.model||"—"}</div>`;
+
+        const td2 = document.createElement("td");
+        td2.textContent = p.type === "accessory" ? "Avto aksessuar" : "Ehtiyot qism";
+
+        const td3 = document.createElement("td");
+        td3.textContent = fmt(p.price);
+
+        const td4 = document.createElement("td");
+        const edit = document.createElement("button");
+        edit.className = "tbtn";
+        edit.textContent = "Tahrirlash";
+        edit.addEventListener("click", () => adminEditProduct(p.id));
+
+        const del = document.createElement("button");
+        del.className = "tbtn danger";
+        del.textContent = "O‘chirish";
+        del.style.marginLeft = "8px";
+        del.addEventListener("click", () => adminDeleteProduct(p.id));
+
+        td4.appendChild(edit);
+        td4.appendChild(del);
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tr.appendChild(td4);
+
+        body.appendChild(tr);
+      });
+    }
+
+    function exportProducts(){
+      const data = JSON.stringify(products, null, 2);
+      navigator.clipboard.writeText(data).then(() => {
+        toast("JSON clipboardga nusxalandi");
+      }).catch(() => {
+        alert(data);
+      });
+    }
+
+    function resetDB(){
+      if (!confirm("Bazani tiklaysizmi? Hamma o‘zgartirishlar o‘chadi.")) return;
+      products = structuredClone(defaultProducts);
+      saveProducts(products);
+      rebuildBrandFilter();
+      renderProducts();
+      renderAdminTable();
+      toast("Baza tiklandi");
+    }
+
+    function init(){
+      rebuildBrandFilter();
+
+      document.getElementById("tabAll").addEventListener("click", () => setActiveTab("all"));
+      document.getElementById("tabSpare").addEventListener("click", () => setActiveTab("spare"));
+      document.getElementById("tabAccessories").addEventListener("click", () => setActiveTab("accessory"));
+
+      document.getElementById("searchBtn").addEventListener("click", renderProducts);
+      document.getElementById("q").addEventListener("keydown", (e) => { if (e.key === "Enter") renderProducts(); });
+
+      document.getElementById("brandFilter").addEventListener("change", renderProducts);
+      document.getElementById("sortBy").addEventListener("change", renderProducts);
+
+      document.getElementById("clearCartBtn").addEventListener("click", clearCart);
+      document.getElementById("checkoutBtn").addEventListener("click", checkout);
+
+      document.getElementById("cartBtn").addEventListener("click", openCart);
+      document.getElementById("closeDrawerBtn").addEventListener("click", closeCart);
+      document.getElementById("overlay").addEventListener("click", closeCart);
+
+      document.getElementById("pCloseBtn").addEventListener("click", closeProductModal);
+      document.getElementById("pOverlay").addEventListener("click", closeProductModal);
+
+      document.getElementById("pAddBtn").addEventListener("click", () => {
+        if (selectedProductId != null) addToCart(selectedProductId);
+      });
+      document.getElementById("pMinusBtn").addEventListener("click", () => {
+        if (selectedProductId != null) removeOneFromCart(selectedProductId);
+      });
+
+      document.getElementById("adminBtn").addEventListener("click", openAdminModal);
+      document.getElementById("adminLogoutBtn").addEventListener("click", adminLogout);
+
+      document.getElementById("aCloseBtn").addEventListener("click", closeAdminModal);
+      document.getElementById("aOverlay").addEventListener("click", closeAdminModal);
+      document.getElementById("aLoginBtn").addEventListener("click", adminLogin);
+      document.getElementById("aPass").addEventListener("keydown", (e) => { if (e.key === "Enter") adminLogin(); });
+
+      document.getElementById("payCloseBtn").addEventListener("click", closePayModal);
+      document.getElementById("payOverlay").addEventListener("click", closePayModal);
+
+      const cardNumber = document.getElementById("cardNumber");
+      cardNumber.addEventListener("input", () => {
+        let v = cardNumber.value.replace(/\D/g,"").slice(0,16);
+        v = v.replace(/(.{4})/g, "$1 ").trim();
+        cardNumber.value = v;
+        document.getElementById("pvNumber").textContent = v || "1234 5678 9012 3456";
+      });
+
+      document.getElementById("cardHolder").addEventListener("input", (e) => {
+        const v = (e.target.value || "").toUpperCase().slice(0,26);
+        document.getElementById("pvName").textContent = v || "NAME SURNAME";
+      });
+
+      function updateExp(){
+        const m = document.getElementById("expMonth").value;
+        const y = document.getElementById("expYear").value;
+        const yy = y ? y.slice(-2) : "";
+        document.getElementById("pvExp").textContent = (m && yy) ? `${m}/${yy}` : "MM/YY";
+      }
+      document.getElementById("expMonth").addEventListener("change", updateExp);
+      document.getElementById("expYear").addEventListener("change", updateExp);
+
+      document.getElementById("cvv").addEventListener("input", (e) => {
+        e.target.value = (e.target.value || "").replace(/\D/g,"").slice(0,3);
+      });
+
+      document.getElementById("payBtn").addEventListener("click", () => {
+        const num = document.getElementById("cardNumber").value.replace(/\s/g,"");
+        const name = document.getElementById("cardHolder").value.trim();
+        const m = document.getElementById("expMonth").value;
+        const y = document.getElementById("expYear").value;
+        const cvv = document.getElementById("cvv").value.trim();
+
+        if (num.length !== 16 || !name || !m || !y || cvv.length !== 3){
+          toast("To‘lov ma’lumotlarini to‘liq kiriting");
+          return;
+        }
+
+        toast("To‘lov (demo) bajarildi");
+        closePayModal();
+        clearCart();
+      });
+
+      document.getElementById("aSaveBtn").addEventListener("click", adminSaveProduct);
+      document.getElementById("aClearBtn").addEventListener("click", adminClearForm);
+      document.getElementById("exportBtn").addEventListener("click", exportProducts);
+      document.getElementById("resetBtn").addEventListener("click", resetDB);
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          closeCart(); closeProductModal(); closeAdminModal(); closePayModal();
+        }
+      });
+
+      renderProducts();
+      renderCart();
+      updateBadges();
+      adminClearForm();
+      setAdminUI();
+    }
+
+    init();
+  </script>
+</body>
+</html>
